@@ -7,6 +7,7 @@
 import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { isDefined } from './lib/utils';
+import { init } from './wattpilot/wattpilot';
 
 export class TypeScript extends utils.Adapter {
     private static instance: TypeScript;
@@ -15,10 +16,9 @@ export class TypeScript extends utils.Adapter {
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
-            name: 'typescipt',
+            name: 'typescript',
         });
         this.on('ready', this.onReady.bind(this));
-        this.on('unload', this.onUnload.bind(this));
         TypeScript.instance = this;
     }
 
@@ -32,23 +32,19 @@ export class TypeScript extends utils.Adapter {
             this.log.error('No instance found.');
             return;
         }
+        const { stateChangeHandler } = await init(this);
         // const {  } = this.config;
 
         this.store = new Store(this);
 
         try {
-            this.on('stateChange', async (id, state) => {});
+            this.on('stateChange', (id, state): void => {
+                stateChangeHandler(id, state);
+            });
         } catch (error) {
             this.store.logger.errorHandler(`Error in onReady`, error);
         }
     }
-
-    /**
-     * Is called when adapter shuts down - callback has to be called under any circumstances!
-     *
-     * @param callback Callback
-     */
-    private onUnload(callback: () => void): void {}
 }
 let adapter;
 
