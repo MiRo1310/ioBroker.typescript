@@ -1,0 +1,15 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"noImplicitAny": false,
+		"noEmit": true,
+		"rootDir": "..",
+		"ignoreDeprecations": "6.0",
+		"types": ["node", "mocha", "chai", "sinon-chai"]
+	},
+	"include": [
+		"../src/**/*.ts",
+		"./**/*.ts",
+		"./mocha.setup.js"
+	]
+}

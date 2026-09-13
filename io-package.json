@@ -1,0 +1,103 @@
+{
+    "common": {
+        "name": "typescript",
+        "version": "0.0.1",
+        "news": {},
+        "titleLang": {
+            "en": "Typescript",
+            "de": "Typescript",
+            "ru": "Typescript",
+            "pt": "Typescript",
+            "nl": "Typescript",
+            "fr": "Typescript",
+            "it": "Typescript",
+            "es": "Typescript",
+            "pl": "Typescript",
+            "uk": "Typescript",
+            "zh-cn": "Typescript"
+        },
+        "desc": {
+            "en": "typescript",
+            "de": "typescript",
+            "ru": "typescript",
+            "pt": "typescript",
+            "nl": "typescript",
+            "fr": "typescript",
+            "it": "typescript",
+            "es": "typescript",
+            "pl": "typescript",
+            "uk": "typescript",
+            "zh-cn": "typescript"
+        },
+        "authors": ["Miro1310 <michael.roling@gmx.de>"],
+        "keywords": ["typescript"],
+        "licenseInformation": {
+            "type": "free",
+            "license": "MIT"
+        },
+        "platform": "Javascript/Node.js",
+        "icon": "typescript.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/Miro1310/ioBroker.typescript/main/admin/typescript.png",
+        "readme": "https://github.com/Miro1310/ioBroker.typescript/blob/main/README.md",
+        "loglevel": "info",
+        "tier": 3,
+        "mode": "daemon",
+        "type": "logik",
+        "compact": true,
+        "connectionType": "cloud",
+        "dataSource": "poll",
+        "adminUI": {
+            "config": "json"
+        },
+        "plugins": {
+            "sentry": {
+                "dsn": ""
+            }
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=6.0.11"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=7.8.23"
+            }
+        ]
+    },
+    "native": {
+        "username": "",
+        "password": "",
+        "refresh": 60,
+        "deviceMac": "",
+        "useDeviceMac": false,
+        "allowInsecureTls": false
+    },
+    "protectedNative": ["password"],
+    "encryptedNative": ["password"],
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}

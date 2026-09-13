@@ -1,0 +1,5 @@
+{
+	"require": ["test/mocha.setup.js"],
+	"watch-files": ["test/**/*.test.ts", "test/**/*.ts", "src/**/*.ts"],
+	"watch-extensions": ["ts", "tsx", "js"]
+}
