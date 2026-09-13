@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/wattpilot/types.ts"],
+  "sourcesContent": ["// Der ioBroker-State speichert den Enum-WERT als Rohwert (z. B. \"1 Phase 7a\", \"auto\"),\n// also die rechte Seite des \"=\" oben \u2014 siehe wpgManualLevelIndexForMode.\nimport type { ChargingStatusEnum } from '../enum/enum';\n\nexport type ChargingStatusMode = ChargingStatusEnum;\n\nexport type WpgChargingLevel = [minWatt: number, ampere: number, singlePhase: boolean];\nexport type WpgBatteryContributionBand = [minBatteryWatt: number, contributionWatt: number];\n\nexport interface WpgStatus {\n    charging: boolean;\n    chargingComplete: boolean;\n    stopReasons: string[];\n    carConnected: boolean;\n    allowCharging: boolean;\n    autoCharging: boolean;\n    currentIndex: number;\n    ampere: number | null;\n    singlePhase: boolean | null;\n    phases: 1 | 3 | null;\n    chargingPowerW: number | null;\n    gridPower: number;\n    batteryPower: number;\n    gridDrawAllowanceUsedPercent: number;\n    increaseLockActive: boolean;\n    increaseLockRemainingSeconds: number;\n    updatedAt: string;\n}\n\nexport interface WpgWallboxChargingStatus {\n    carConnected: boolean;\n    chargingActive: boolean;\n    chargingComplete: boolean;\n    power: number;\n    soc: number | null;\n    targetSoc: number | null;\n    powerOffDelayRunning: boolean;\n    updatedAt: string;\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;AAAA;AAAA;",
+  "names": []
+}

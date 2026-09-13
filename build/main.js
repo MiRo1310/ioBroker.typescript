@@ -35,16 +35,19 @@ module.exports = __toCommonJS(main_exports);
 var import_store = require("./lib/store");
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_utils = require("./lib/utils");
+var import_wattpilot = require("./wattpilot/wattpilot");
+var import_globalMethods = require("./lib/globalMethods");
 class TypeScript extends utils.Adapter {
   static instance;
   store;
+  logger;
+  toTelegramm;
   constructor(options = {}) {
     super({
       ...options,
-      name: "typescipt"
+      name: "typescript"
     });
     this.on("ready", this.onReady.bind(this));
-    this.on("unload", this.onUnload.bind(this));
     TypeScript.instance = this;
   }
   static getInstance() {
@@ -56,20 +59,18 @@ class TypeScript extends utils.Adapter {
       this.log.error("No instance found.");
       return;
     }
+    const { stateChangeHandler } = await (0, import_wattpilot.init)(this);
     this.store = new import_store.Store(this);
+    const global = new import_globalMethods.Global(this);
+    this.logger = global.logger;
+    this.toTelegramm = global.toTelegram.bind(this);
     try {
-      this.on("stateChange", async (id, state) => {
+      this.on("stateChange", (id, state) => {
+        stateChangeHandler(id, state);
       });
     } catch (error) {
-      this.store.logger.errorHandler(`Error in onReady`, error);
+      this.logger.errorHandler(`Error in onReady`, error);
     }
-  }
-  /**
-   * Is called when adapter shuts down - callback has to be called under any circumstances!
-   *
-   * @param callback Callback
-   */
-  onUnload(callback) {
   }
 }
 let adapter;

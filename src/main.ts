@@ -8,10 +8,14 @@ import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { isDefined } from './lib/utils';
 import { init } from './wattpilot/wattpilot';
+import type { Logger } from './lib/loggingController';
+import { Global } from './lib/globalMethods';
 
 export class TypeScript extends utils.Adapter {
     private static instance: TypeScript;
-    private store!: Store;
+    public store!: Store;
+    public logger!: Logger;
+    public toTelegramm!: (user: 'Michael', value: string, keyboard: []) => void;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -36,13 +40,16 @@ export class TypeScript extends utils.Adapter {
         // const {  } = this.config;
 
         this.store = new Store(this);
+        const global = new Global(this);
+        this.logger = global.logger;
+        this.toTelegramm = global.toTelegram.bind(this);
 
         try {
             this.on('stateChange', (id, state): void => {
                 stateChangeHandler(id, state);
             });
         } catch (error) {
-            this.store.logger.errorHandler(`Error in onReady`, error);
+            this.logger.errorHandler(`Error in onReady`, error);
         }
     }
 }

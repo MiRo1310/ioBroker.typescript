@@ -16,18 +16,16 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var store_exports = {};
-__export(store_exports, {
-  Store: () => Store
+var state_exports = {};
+__export(state_exports, {
+  stateChanged: () => stateChanged
 });
-module.exports = __toCommonJS(store_exports);
-class Store {
-  constructor(adapter) {
-    this.adapter = adapter;
-  }
+module.exports = __toCommonJS(state_exports);
+function stateChanged(state, oldValue) {
+  return (state == null ? void 0 : state.val) !== oldValue;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  Store
+  stateChanged
 });
-//# sourceMappingURL=store.js.map
+//# sourceMappingURL=state.js.map
