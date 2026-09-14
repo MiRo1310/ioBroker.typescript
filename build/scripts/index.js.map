@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/scripts/index.ts"],
+  "sourcesContent": ["import type { TypeScript } from '../main';\nimport type { ReturnTypeInit, ScriptModule, StateChangeHandler } from './types';\nimport wattPilot from './wattpilot/wattpilot';\n\nconst modules: ScriptModule[] = [wattPilot];\n\nexport async function init(adapter: TypeScript): ReturnTypeInit {\n    const handlers = await Promise.all(modules.map(module => module.init(adapter)));\n\n    const stateChangeHandler: StateChangeHandler = (id, state) => {\n        handlers.forEach(({ stateChangeHandler: handler }) => handler(id, state));\n    };\n\n    return { stateChangeHandler };\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAEA,uBAAsB;AAEtB,MAAM,UAA0B,CAAC,iBAAAA,OAAS;AAE1C,eAAsB,KAAK,SAAqC;AAC5D,QAAM,WAAW,MAAM,QAAQ,IAAI,QAAQ,IAAI,CAAAC,YAAUA,QAAO,KAAK,OAAO,CAAC,CAAC;AAE9E,QAAM,qBAAyC,CAAC,IAAI,UAAU;AAC1D,aAAS,QAAQ,CAAC,EAAE,oBAAoB,QAAQ,MAAM,QAAQ,IAAI,KAAK,CAAC;AAAA,EAC5E;AAEA,SAAO,EAAE,mBAAmB;AAChC;",
+  "names": ["wattPilot", "module"]
+}

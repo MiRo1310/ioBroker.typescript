@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../../src/lib/store.ts"],
-  "sourcesContent": ["import { Logger } from './loggingController';\nimport type { TypeScript } from '../main';\n\nexport class Store {\n    public readonly logger: Logger;\n\n    constructor(public readonly adapter: TypeScript) {\n        this.logger = new Logger(this.adapter);\n    }\n}\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,+BAAuB;AAGhB,MAAM,MAAM;AAAA,EAGf,YAA4B,SAAqB;AAArB;AACxB,SAAK,SAAS,IAAI,gCAAO,KAAK,OAAO;AAAA,EACzC;AAAA,EAJgB;AAKpB;",
+  "sourcesContent": ["import type { TypeScript } from '../main';\n\nexport class Store {\n    constructor(public readonly adapter: TypeScript) {}\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAEO,MAAM,MAAM;AAAA,EACf,YAA4B,SAAqB;AAArB;AAAA,EAAsB;AACtD;",
   "names": []
 }

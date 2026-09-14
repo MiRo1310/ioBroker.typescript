@@ -7,18 +7,22 @@
 import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { isDefined } from './lib/utils';
+import type { Logger } from './lib/loggingController';
+import { Global } from './lib/globalMethods';
+import { init } from './scripts';
 
 export class TypeScript extends utils.Adapter {
     private static instance: TypeScript;
-    private store!: Store;
+    public store!: Store;
+    public logger!: Logger;
+    public toTelegramm!: (user: 'Michael', value: string, keyboard: []) => void;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
-            name: 'typescipt',
+            name: 'typescript',
         });
         this.on('ready', this.onReady.bind(this));
-        this.on('unload', this.onUnload.bind(this));
         TypeScript.instance = this;
     }
 
@@ -32,23 +36,24 @@ export class TypeScript extends utils.Adapter {
             this.log.error('No instance found.');
             return;
         }
+        const { stateChangeHandler } = await init(this);
         // const {  } = this.config;
 
         this.store = new Store(this);
+        const global = new Global(this);
+        this.logger = global.logger;
+        this.toTelegramm = global.toTelegram.bind(this);
 
         try {
-            this.on('stateChange', async (id, state) => {});
+            this.on('stateChange', (id, state): void => {
+                stateChangeHandler(id, state);
+            });
         } catch (error) {
-            this.store.logger.errorHandler(`Error in onReady`, error);
+            this.logger.errorHandler(`Error in onReady`, error);
+            await this.setState('info.connection', false, true);
         }
+        await this.setState('info.connection', true, true);
     }
-
-    /**
-     * Is called when adapter shuts down - callback has to be called under any circumstances!
-     *
-     * @param callback Callback
-     */
-    private onUnload(callback: () => void): void {}
 }
 let adapter;
 

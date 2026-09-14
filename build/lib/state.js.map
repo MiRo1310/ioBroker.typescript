@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/lib/state.ts"],
+  "sourcesContent": ["export function stateChanged(state?: ioBroker.State | null, oldValue?: string | number | boolean | null): boolean {\n    return state?.val !== oldValue;\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,SAAS,aAAa,OAA+B,UAAsD;AAC9G,UAAO,+BAAO,SAAQ;AAC1B;",
+  "names": []
+}

@@ -1,0 +1,28 @@
+// Reihenfolge der Level-Werte (1P6A...3P16A) deckt sich bewusst 1:1 mit
+// WPG_CHARGE_CURVE — AUTO/DISABLED stehen deshalb am Ende, siehe wpgManualLevelIndexForMode.
+export enum ChargingStatusEnum {
+    '1P6A' = '1 Phase 6a',
+    '1P7A' = '1 Phase 7a',
+    '1P8A' = '1 Phase 8a',
+    '1P9A' = '1 Phase 9a',
+    '1P10A' = '1 Phase 10a',
+    '1P11A' = '1 Phase 11a',
+    '1P12A' = '1 Phase 12a',
+    '1P13A' = '1 Phase 13a',
+    '1P14A' = '1 Phase 14a',
+    '1P15A' = '1 Phase 15a',
+    '1P16A' = '1 Phase 16a',
+    '3P6A' = '3 Phasen 6a',
+    '3P7A' = '3 Phasen 7a',
+    '3P8A' = '3 Phasen 8a',
+    '3P9A' = '3 Phasen 9a',
+    '3P10A' = '3 Phasen 10a',
+    '3P11A' = '3 Phasen 11a',
+    '3P12A' = '3 Phasen 12a',
+    '3P13A' = '3 Phasen 13a',
+    '3P14A' = '3 Phasen 14a',
+    '3P15A' = '3 Phasen 15a',
+    '3P16A' = '3 Phasen 16a',
+    AUTO = 'auto',
+    DISABLED = 'disabled',
+}

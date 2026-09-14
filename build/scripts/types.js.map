@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/scripts/types.ts"],
+  "sourcesContent": ["import type { TypeScript } from '../main';\n\nexport type StateChangeHandler = (id: string, state?: ioBroker.State | null) => void;\n\nexport type ReturnTypeInit = Promise<{ stateChangeHandler: StateChangeHandler }>;\n// Bauplan f\u00FCr jedes Script-Modul unter src/scripts/*: init() bekommt den Adapter\n// und liefert den Handler, der bei jedem stateChange dieses Moduls aufgerufen wird.\nexport interface ScriptModule {\n    init(adapter: TypeScript): ReturnTypeInit;\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;AAAA;AAAA;",
+  "names": []
+}

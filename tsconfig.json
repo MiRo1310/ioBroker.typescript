@@ -18,7 +18,12 @@
 		"rootDir": ".",
 		"outDir": "./build/",
 		"removeComments": false,
-		"allowImportingTsExtensions": true,
+
+		// Kein "type": "module" in package.json, esbuild baut ohnehin als CJS (format: "cjs",
+		// unabhängig von dieser Einstellung) — daher hier klassisches CJS statt NodeNext, sonst
+		// verlangt Node16/NodeNext-Resolution zwingend Dateiendungen bei relativen Imports.
+		"module": "commonjs",
+		"moduleResolution": "node",
 
 		// This is necessary for the automatic typing of the adapter config
 		"resolveJsonModule": true,
