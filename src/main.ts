@@ -7,9 +7,9 @@
 import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { isDefined } from './lib/utils';
-import { init } from './wattpilot/wattpilot';
 import type { Logger } from './lib/loggingController';
 import { Global } from './lib/globalMethods';
+import { init } from './scripts';
 
 export class TypeScript extends utils.Adapter {
     private static instance: TypeScript;
@@ -50,7 +50,9 @@ export class TypeScript extends utils.Adapter {
             });
         } catch (error) {
             this.logger.errorHandler(`Error in onReady`, error);
+            await this.setState('info.connection', false, true);
         }
+        await this.setState('info.connection', true, true);
     }
 }
 let adapter;

@@ -4,12 +4,13 @@
  * Input:  grid power (Modbus)
  * Output: wattpilot set_state (psm, frc) + set_power
  */
-import { ChargingStatusEnum } from '../enum/enum';
+import { ChargingStatusEnum } from '../../enum/enum';
 import type { ChargingStatusMode, WpgStatus, WpgWallboxChargingStatus } from './types';
 import { WPG_BATTERY_CONTRIBUTION_BANDS, WPG_CHARGE_CURVE } from './data';
-import type { TypeScript } from '../main';
-import { isDefined } from '../lib/utils';
-import { stateChanged } from '../lib/state';
+import type { TypeScript } from '../../main';
+import type { ReturnTypeInit, ScriptModule } from '../types';
+import { isDefined } from '../../lib/utils';
+import { stateChanged } from '../../lib/state';
 
 const WPG_FRONIUS_SET_STATE = 'fronius-wattpilot.0.set_state';
 const WPG_FRONIUS_SET_POWER = 'fronius-wattpilot.0.set_power';
@@ -39,9 +40,7 @@ const WPG_START_HOLD_MS = 30 * 1000; // Kaltstart / Phasenwechsel 1P->3P: Hardwa
 const WPG_STEP_UP_LOCK_MS = 10 * 1000; // normale Stufenerhöhung ohne Phasenwechsel: kurze Sperre gegen Hin-und-Her
 const WPG_START_INDEX = 0; // lowest level: 1P 6A — gives the wallbox a stable point to start from
 
-export async function init(
-    adapter: TypeScript,
-): Promise<{ stateChangeHandler: (id: string, state?: ioBroker.State | null) => void }> {
+async function init(adapter: TypeScript): ReturnTypeInit {
     await adapter.subscribeForeignStatesAsync([
         WPG_ACTUAL_POWER_ID,
         WPG_CAR_CONNECTED_ID,
@@ -651,3 +650,7 @@ export async function init(
 
     return { stateChangeHandler };
 }
+
+const wattPilot: ScriptModule = { init };
+
+export default wattPilot;

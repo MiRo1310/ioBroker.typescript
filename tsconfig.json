@@ -18,7 +18,11 @@
 		"rootDir": ".",
 		"outDir": "./build/",
 		"removeComments": false,
-		"allowImportingTsExtensions": true,
+
+		// build-adapter (esbuild) resolves imports itself, so let tsc match that
+		// instead of Node's ESM resolver — relative imports no longer need an extension
+		"module": "esnext",
+		"moduleResolution": "bundler",
 
 		// This is necessary for the automatic typing of the adapter config
 		"resolveJsonModule": true,

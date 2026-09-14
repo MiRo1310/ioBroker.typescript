@@ -35,8 +35,8 @@ module.exports = __toCommonJS(main_exports);
 var import_store = require("./lib/store");
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_utils = require("./lib/utils");
-var import_wattpilot = require("./wattpilot/wattpilot");
 var import_globalMethods = require("./lib/globalMethods");
+var import_scripts = require("./scripts");
 class TypeScript extends utils.Adapter {
   static instance;
   store;
@@ -59,7 +59,7 @@ class TypeScript extends utils.Adapter {
       this.log.error("No instance found.");
       return;
     }
-    const { stateChangeHandler } = await (0, import_wattpilot.init)(this);
+    const { stateChangeHandler } = await (0, import_scripts.init)(this);
     this.store = new import_store.Store(this);
     const global = new import_globalMethods.Global(this);
     this.logger = global.logger;
@@ -70,7 +70,9 @@ class TypeScript extends utils.Adapter {
       });
     } catch (error) {
       this.logger.errorHandler(`Error in onReady`, error);
+      await this.setState("info.connection", false, true);
     }
+    await this.setState("info.connection", true, true);
   }
 }
 let adapter;

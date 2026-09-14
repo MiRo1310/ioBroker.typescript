@@ -18,13 +18,13 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var wattpilot_exports = {};
 __export(wattpilot_exports, {
-  init: () => init
+  default: () => wattpilot_default
 });
 module.exports = __toCommonJS(wattpilot_exports);
-var import_enum = require("../enum/enum");
+var import_enum = require("../../enum/enum");
 var import_data = require("./data");
-var import_utils = require("../lib/utils");
-var import_state = require("../lib/state");
+var import_utils = require("../../lib/utils");
+var import_state = require("../../lib/state");
 const WPG_FRONIUS_SET_STATE = "fronius-wattpilot.0.set_state";
 const WPG_FRONIUS_SET_POWER = "fronius-wattpilot.0.set_power";
 const WPG_ACTUAL_POWER_ID = "fronius-wattpilot.0.power";
@@ -527,8 +527,6 @@ async function init(adapter) {
   }
   return { stateChangeHandler };
 }
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  init
-});
+const wattPilot = { init };
+var wattpilot_default = wattPilot;
 //# sourceMappingURL=wattpilot.js.map

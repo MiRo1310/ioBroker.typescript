@@ -1,6 +1,6 @@
 // Der ioBroker-State speichert den Enum-WERT als Rohwert (z. B. "1 Phase 7a", "auto"),
 // also die rechte Seite des "=" oben — siehe wpgManualLevelIndexForMode.
-import type { ChargingStatusEnum } from '../enum/enum';
+import type { ChargingStatusEnum } from '../../enum/enum';
 
 export type ChargingStatusMode = ChargingStatusEnum;
 

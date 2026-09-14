@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { utils } from '@iobroker/testing';
 
-import { init } from '../../src/wattpilot/wattpilot';
+import wattpilot from '../../src/scripts/wattpilot/wattpilot';
 import { ChargingStatusEnum } from '../../src/enum/enum';
 import type { TypeScript } from '../../src/main';
 
@@ -10,6 +10,7 @@ type Val = string | number | boolean;
 
 const SET_STATE_ID = 'fronius-wattpilot.0.set_state';
 const SET_POWER_ID = 'fronius-wattpilot.0.set_power';
+
 const ACTUAL_POWER_ID = 'fronius-wattpilot.0.power';
 const CAR_CONNECTED_ID = 'fronius-wattpilot.0.carConnected';
 const GRID_POWER_ID = 'modbus.0.holdingRegisters.41079_grid_Power';
@@ -49,7 +50,7 @@ describe('Wattpilot PV-Überschussladen', () => {
         for (const [id, val] of Object.entries(seed)) {
             await adapter.setStateAsync(id, val, true);
         }
-        const { stateChangeHandler } = await init(adapter as unknown as TypeScript);
+        const { stateChangeHandler } = await wattpilot.init(adapter as unknown as TypeScript);
         const handler = stateChangeHandler as unknown as (id: string, state?: ioBroker.State | null) => Promise<void>;
         return async (id, val, ack = false): Promise<void> => {
             await handler(id, mkState(val, ack));
