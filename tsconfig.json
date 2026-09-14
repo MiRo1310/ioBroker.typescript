@@ -19,10 +19,11 @@
 		"outDir": "./build/",
 		"removeComments": false,
 
-		// build-adapter (esbuild) resolves imports itself, so let tsc match that
-		// instead of Node's ESM resolver — relative imports no longer need an extension
-		"module": "esnext",
-		"moduleResolution": "bundler",
+		// Kein "type": "module" in package.json, esbuild baut ohnehin als CJS (format: "cjs",
+		// unabhängig von dieser Einstellung) — daher hier klassisches CJS statt NodeNext, sonst
+		// verlangt Node16/NodeNext-Resolution zwingend Dateiendungen bei relativen Imports.
+		"module": "commonjs",
+		"moduleResolution": "node",
 
 		// This is necessary for the automatic typing of the adapter config
 		"resolveJsonModule": true,

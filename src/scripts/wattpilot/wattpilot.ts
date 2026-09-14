@@ -100,39 +100,39 @@ async function init(adapter: TypeScript): ReturnTypeInit {
     let wpgEnableLogging = true;
     let wpgGridDrawAllowanceWatt = 0;
 
-    const wpgInitBattery = await adapter.getStateAsync(WPG_BATTERY_POWER_ID);
+    const wpgInitBattery = await adapter.getForeignStateAsync(WPG_BATTERY_POWER_ID);
     if (wpgInitBattery) {
         wpgBatteryPower = wpgInitBattery.val as number;
     }
 
-    const wpgInitCar = await adapter.getStateAsync(WPG_CAR_CONNECTED_ID);
+    const wpgInitCar = await adapter.getForeignStateAsync(WPG_CAR_CONNECTED_ID);
     if (wpgInitCar) {
         wpgCarConnected = WPG_CONNECTED_STATUSES.includes(wpgInitCar.val as string);
     }
 
-    const wpgInitChargingMode = await adapter.getStateAsync(WPG_CHARGING_MODE_ID);
+    const wpgInitChargingMode = await adapter.getForeignStateAsync(WPG_CHARGING_MODE_ID);
     if (wpgInitChargingMode) {
         wpgChargingMode = wpgInitChargingMode.val as ChargingStatusMode;
     }
 
-    const wpgInitEnableLogging = await adapter.getStateAsync(WPG_ENABLE_LOGGING_ID);
+    const wpgInitEnableLogging = await adapter.getForeignStateAsync(WPG_ENABLE_LOGGING_ID);
     if (wpgInitEnableLogging) {
         wpgEnableLogging = !!wpgInitEnableLogging.val;
     }
 
-    const wpgInitGridDrawAllowance = await adapter.getStateAsync(WPG_GRID_DRAW_ALLOWANCE_ID);
+    const wpgInitGridDrawAllowance = await adapter.getForeignStateAsync(WPG_GRID_DRAW_ALLOWANCE_ID);
     if (wpgInitGridDrawAllowance) {
         wpgGridDrawAllowanceWatt = (wpgInitGridDrawAllowance.val as number) ?? 0;
     }
 
     const wpgInitChargingStatus = wpgParseChargingStatus(
-        (await adapter.getStateAsync(WPG_CHARGING_STATUS_ID))?.val as string | undefined,
+        (await adapter.getForeignStateAsync(WPG_CHARGING_STATUS_ID))?.val as string | undefined,
     );
     if (wpgInitChargingStatus) {
         wpgChargingComplete = wpgInitChargingStatus.chargingComplete;
     }
 
-    const wpgInitPower = await adapter.getStateAsync(WPG_ACTUAL_POWER_ID);
+    const wpgInitPower = await adapter.getForeignStateAsync(WPG_ACTUAL_POWER_ID);
     if (wpgInitPower) {
         wpgActualPower = ((wpgInitPower.val as number) ?? 0) * 1000; // DP liefert kW, intern wird mit Watt gerechnet
     }
@@ -151,7 +151,7 @@ async function init(adapter: TypeScript): ReturnTypeInit {
     // Bestätigt ein per Kommando (ack=false) gesetztes State mit ack=true, sobald
     // die daraus resultierende Änderung verarbeitet wurde. Für beliebige State-IDs nutzbar.
     async function wpgAckState(id: string, val: string | number | boolean | null): Promise<void> {
-        await adapter.setState(id, val, true);
+        await adapter.setForeignStateAsync(id, val, true);
     }
 
     function wpgComputeAvailableSurplus(): number {
@@ -316,7 +316,7 @@ async function init(adapter: TypeScript): ReturnTypeInit {
             increaseLockRemainingSeconds: Math.max(0, Math.round((wpgIncreaseLockedUntil - now) / 1000)),
             updatedAt: new Date().toISOString(),
         };
-        await adapter.setStateChangedAsync(WPG_STATUS_STATE_ID, JSON.stringify(status), true);
+        await adapter.setForeignStateChangedAsync(WPG_STATUS_STATE_ID, JSON.stringify(status), true);
     }
 
     function wpgCancelOffTimer(): void {
@@ -386,7 +386,7 @@ async function init(adapter: TypeScript): ReturnTypeInit {
         );
 
         await (singlePhase ? wpgSetOnePhaseLoading() : wpgSetThreePhaseLoading());
-        await adapter.setStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
+        await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
         await wpgStartLoading();
         if (lockMs > 0) {
             wpgLockIncreases(lockMs);
@@ -475,7 +475,7 @@ async function init(adapter: TypeScript): ReturnTypeInit {
                 wpgLogging(
                     `Überschuss reicht nicht mehr für aktuelle Stufe — reduziere auf Minimum: ${wpgLevelLabel(lowest)}`,
                 );
-                await adapter.setStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
+                await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
                 await wpgWriteStatusForWattpilot(true);
             } else {
                 await wpgWriteStatusForWattpilot();
@@ -511,7 +511,7 @@ async function init(adapter: TypeScript): ReturnTypeInit {
             wpgCurrentPhase = singlePhase;
             wpgLogging(`Setze Ladung: ${wpgLevelLabel(newIndex)}`);
             await (singlePhase ? wpgSetOnePhaseLoading() : wpgSetThreePhaseLoading());
-            await adapter.setStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
+            await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
             await wpgStartLoading();
             await wpgWriteStatusForWattpilot(true);
             return;
@@ -632,20 +632,20 @@ async function init(adapter: TypeScript): ReturnTypeInit {
     }
 
     async function wpgSetOnePhaseLoading(): Promise<void> {
-        await adapter.setStateChangedAsync(WPG_FRONIUS_SET_STATE, 'psm;1', false);
+        await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_STATE, 'psm;1', false);
     }
 
     async function wpgSetThreePhaseLoading(): Promise<void> {
-        await adapter.setStateChangedAsync(WPG_FRONIUS_SET_STATE, 'psm;2', false);
+        await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_STATE, 'psm;2', false);
     }
 
     async function wpgStartLoading(): Promise<void> {
-        await adapter.setStateChangedAsync(WPG_FRONIUS_SET_STATE, 'frc;0', false);
+        await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_STATE, 'frc;0', false);
     }
 
     async function wpgStopLoading(): Promise<void> {
         wpgLogging(`Laden gestoppt`);
-        await adapter.setStateChangedAsync(WPG_FRONIUS_SET_STATE, 'frc;1', false);
+        await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_STATE, 'frc;1', false);
     }
 
     return { stateChangeHandler };

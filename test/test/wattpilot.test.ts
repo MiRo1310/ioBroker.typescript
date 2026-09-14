@@ -4,7 +4,6 @@ import { utils } from '@iobroker/testing';
 
 import wattpilot from '../../src/scripts/wattpilot/wattpilot';
 import { ChargingStatusEnum } from '../../src/enum/enum';
-import type { TypeScript } from '../../src/main';
 
 type Val = string | number | boolean;
 
@@ -48,9 +47,9 @@ describe('Wattpilot PV-Überschussladen', () => {
         seed: Record<string, Val> = {},
     ): Promise<(id: string, val: Val, ack?: boolean) => Promise<void>> {
         for (const [id, val] of Object.entries(seed)) {
-            await adapter.setStateAsync(id, val, true);
+            await adapter.setForeignStateAsync(id, val, true);
         }
-        const { stateChangeHandler } = await wattpilot.init(adapter as unknown as TypeScript);
+        const { stateChangeHandler } = await wattpilot.init(adapter);
         const handler = stateChangeHandler as unknown as (id: string, state?: ioBroker.State | null) => Promise<void>;
         return async (id, val, ack = false): Promise<void> => {
             await handler(id, mkState(val, ack));
@@ -58,7 +57,7 @@ describe('Wattpilot PV-Überschussladen', () => {
     }
 
     async function statusJson(): Promise<any> {
-        const state = await adapter.getStateAsync(STATUS_STATE_ID);
+        const state = await adapter.getForeignStateAsync(STATUS_STATE_ID);
         return JSON.parse(state?.val as string);
     }
 
@@ -71,8 +70,8 @@ describe('Wattpilot PV-Überschussladen', () => {
 
         await fire(GRID_POWER_ID, 1500);
 
-        expect((await adapter.getStateAsync(SET_STATE_ID))?.val).to.equal('frc;0');
-        expect((await adapter.getStateAsync(SET_POWER_ID))?.val).to.equal(6);
+        expect((await adapter.getForeignStateAsync(SET_STATE_ID))?.val).to.equal('frc;0');
+        expect((await adapter.getForeignStateAsync(SET_POWER_ID))?.val).to.equal(6);
 
         const status = await statusJson();
         expect(status.charging).to.equal(true);
@@ -90,8 +89,8 @@ describe('Wattpilot PV-Überschussladen', () => {
 
         await fire(GRID_POWER_ID, 1000); // < 1380W Mindestschwelle für 1P6A
 
-        expect((await adapter.getStateAsync(SET_POWER_ID))?.val).to.equal(undefined);
-        expect((await adapter.getStateAsync(SET_STATE_ID))?.val).to.equal('frc;1'); // weiterhin gestoppt (vom Start)
+        expect((await adapter.getForeignStateAsync(SET_POWER_ID))?.val).to.equal(undefined);
+        expect((await adapter.getForeignStateAsync(SET_STATE_ID))?.val).to.equal('frc;1'); // weiterhin gestoppt (vom Start)
     });
 
     it('Netzbezugs-Freigabe hält 1P6A trotz leichtem Netzbezug', async () => {
@@ -104,7 +103,7 @@ describe('Wattpilot PV-Überschussladen', () => {
 
         await fire(GRID_POWER_ID, 1200); // 180W Netzbezug, innerhalb der 200W-Freigabe
 
-        expect((await adapter.getStateAsync(SET_POWER_ID))?.val).to.equal(6);
+        expect((await adapter.getForeignStateAsync(SET_POWER_ID))?.val).to.equal(6);
         const status = await statusJson();
         expect(status.currentIndex).to.equal(0);
         expect(status.gridDrawAllowanceUsedPercent).to.equal(90);
@@ -118,27 +117,27 @@ describe('Wattpilot PV-Überschussladen', () => {
 
         // Manuell auf 1P10A (Schwelle 2300W) setzen, unabhängig vom Überschuss
         await fire(CHARGING_MODE_ID, ChargingStatusEnum['1P10A']);
-        expect((await adapter.getStateAsync(SET_POWER_ID))?.val).to.equal(10);
+        expect((await adapter.getForeignStateAsync(SET_POWER_ID))?.val).to.equal(10);
 
         // Überschuss liegt 150W unter der Schwelle, aber innerhalb der 200W-Hysterese
         await fire(GRID_POWER_ID, -150);
         // Auf Automatik umschalten - darf wegen Hysterese NICHT runterschalten
         await fire(CHARGING_MODE_ID, ChargingStatusEnum.AUTO);
 
-        expect((await adapter.getStateAsync(SET_POWER_ID))?.val).to.equal(10); // unverändert
+        expect((await adapter.getForeignStateAsync(SET_POWER_ID))?.val).to.equal(10); // unverändert
     });
 
     it('ack-Rückschreiben löst keinen erneuten Durchlauf aus (kein Endlos-Loop)', async () => {
         const fire = await setup({});
 
         await fire(CHARGING_MODE_ID, ChargingStatusEnum.AUTO, false);
-        const callsAfterFirst = (adapter.setState as unknown as { callCount: number }).callCount;
+        const callsAfterFirst = (adapter.setForeignStateAsync as unknown as { callCount: number }).callCount;
         expect(callsAfterFirst).to.be.greaterThan(0); // ack wurde geschrieben
 
         // Simuliert das eigene ack=true-Echo, das durch obigen setState-Aufruf entsteht
         await fire(CHARGING_MODE_ID, ChargingStatusEnum.AUTO, true);
 
-        expect((adapter.setState as unknown as { callCount: number }).callCount).to.equal(callsAfterFirst);
+        expect((adapter.setForeignStateAsync as unknown as { callCount: number }).callCount).to.equal(callsAfterFirst);
     });
 
     it('manueller Modus setzt die Stufe direkt, ohne Überschussprüfung (3-phasig)', async () => {
@@ -146,8 +145,8 @@ describe('Wattpilot PV-Überschussladen', () => {
 
         await fire(CHARGING_MODE_ID, ChargingStatusEnum['3P10A']);
 
-        expect((await adapter.getStateAsync(SET_POWER_ID))?.val).to.equal(10);
-        expect((await adapter.getStateAsync(SET_STATE_ID))?.val).to.equal('frc;0'); // lädt
+        expect((await adapter.getForeignStateAsync(SET_POWER_ID))?.val).to.equal(10);
+        expect((await adapter.getForeignStateAsync(SET_STATE_ID))?.val).to.equal('frc;0'); // lädt
 
         const status = await statusJson();
         expect(status.singlePhase).to.equal(false);
@@ -158,11 +157,11 @@ describe('Wattpilot PV-Überschussladen', () => {
         const fire = await setup({});
 
         await fire(CHARGING_MODE_ID, ChargingStatusEnum['1P10A']);
-        expect((await adapter.getStateAsync(SET_STATE_ID))?.val).to.equal('frc;0');
+        expect((await adapter.getForeignStateAsync(SET_STATE_ID))?.val).to.equal('frc;0');
 
         await fire(CHARGING_MODE_ID, ChargingStatusEnum.DISABLED);
 
-        expect((await adapter.getStateAsync(SET_STATE_ID))?.val).to.equal('frc;1');
+        expect((await adapter.getForeignStateAsync(SET_STATE_ID))?.val).to.equal('frc;1');
         const status = await statusJson();
         expect(status.charging).to.equal(false);
     });
@@ -173,12 +172,12 @@ describe('Wattpilot PV-Überschussladen', () => {
             [CAR_CONNECTED_ID]: 'Charging',
         });
 
-        const callsBefore = (adapter.setStateChangedAsync as unknown as { callCount: number }).callCount;
+        const callsBefore = (adapter.setForeignStateChangedAsync as unknown as { callCount: number }).callCount;
 
         // Wallbox lädt bereits (500W), Skript-Index ist aber noch -1 -> Resync
         await fire(ACTUAL_POWER_ID, 0.5);
 
-        expect((adapter.setStateChangedAsync as unknown as { callCount: number }).callCount).to.be.greaterThan(
+        expect((adapter.setForeignStateChangedAsync as unknown as { callCount: number }).callCount).to.be.greaterThan(
             callsBefore,
         );
         const status = await statusJson();

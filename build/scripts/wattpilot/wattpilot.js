@@ -98,33 +98,33 @@ async function init(adapter) {
   let wpgChargingComplete = false;
   let wpgEnableLogging = true;
   let wpgGridDrawAllowanceWatt = 0;
-  const wpgInitBattery = await adapter.getStateAsync(WPG_BATTERY_POWER_ID);
+  const wpgInitBattery = await adapter.getForeignStateAsync(WPG_BATTERY_POWER_ID);
   if (wpgInitBattery) {
     wpgBatteryPower = wpgInitBattery.val;
   }
-  const wpgInitCar = await adapter.getStateAsync(WPG_CAR_CONNECTED_ID);
+  const wpgInitCar = await adapter.getForeignStateAsync(WPG_CAR_CONNECTED_ID);
   if (wpgInitCar) {
     wpgCarConnected = WPG_CONNECTED_STATUSES.includes(wpgInitCar.val);
   }
-  const wpgInitChargingMode = await adapter.getStateAsync(WPG_CHARGING_MODE_ID);
+  const wpgInitChargingMode = await adapter.getForeignStateAsync(WPG_CHARGING_MODE_ID);
   if (wpgInitChargingMode) {
     wpgChargingMode = wpgInitChargingMode.val;
   }
-  const wpgInitEnableLogging = await adapter.getStateAsync(WPG_ENABLE_LOGGING_ID);
+  const wpgInitEnableLogging = await adapter.getForeignStateAsync(WPG_ENABLE_LOGGING_ID);
   if (wpgInitEnableLogging) {
     wpgEnableLogging = !!wpgInitEnableLogging.val;
   }
-  const wpgInitGridDrawAllowance = await adapter.getStateAsync(WPG_GRID_DRAW_ALLOWANCE_ID);
+  const wpgInitGridDrawAllowance = await adapter.getForeignStateAsync(WPG_GRID_DRAW_ALLOWANCE_ID);
   if (wpgInitGridDrawAllowance) {
     wpgGridDrawAllowanceWatt = (_a = wpgInitGridDrawAllowance.val) != null ? _a : 0;
   }
   const wpgInitChargingStatus = wpgParseChargingStatus(
-    (_b = await adapter.getStateAsync(WPG_CHARGING_STATUS_ID)) == null ? void 0 : _b.val
+    (_b = await adapter.getForeignStateAsync(WPG_CHARGING_STATUS_ID)) == null ? void 0 : _b.val
   );
   if (wpgInitChargingStatus) {
     wpgChargingComplete = wpgInitChargingStatus.chargingComplete;
   }
-  const wpgInitPower = await adapter.getStateAsync(WPG_ACTUAL_POWER_ID);
+  const wpgInitPower = await adapter.getForeignStateAsync(WPG_ACTUAL_POWER_ID);
   if (wpgInitPower) {
     wpgActualPower = ((_c = wpgInitPower.val) != null ? _c : 0) * 1e3;
   }
@@ -137,7 +137,7 @@ async function init(adapter) {
     console[type](`[Wattpilot] ${msg}`);
   }
   async function wpgAckState(id, val) {
-    await adapter.setState(id, val, true);
+    await adapter.setForeignStateAsync(id, val, true);
   }
   function wpgComputeAvailableSurplus() {
     if (wpgBatteryPower < 0) {
@@ -262,7 +262,7 @@ async function init(adapter) {
       increaseLockRemainingSeconds: Math.max(0, Math.round((wpgIncreaseLockedUntil - now) / 1e3)),
       updatedAt: (/* @__PURE__ */ new Date()).toISOString()
     };
-    await adapter.setStateChangedAsync(WPG_STATUS_STATE_ID, JSON.stringify(status), true);
+    await adapter.setForeignStateChangedAsync(WPG_STATUS_STATE_ID, JSON.stringify(status), true);
   }
   function wpgCancelOffTimer() {
     if (wpgOffTimer !== null) {
@@ -316,7 +316,7 @@ async function init(adapter) {
       lockMs > 0 ? `${reason}: ${wpgLevelLabel(index)} f\xFCr ${lockMs / 1e3}s Hochschalt-Sperre` : `${reason}: ${wpgLevelLabel(index)}`
     );
     await (singlePhase ? wpgSetOnePhaseLoading() : wpgSetThreePhaseLoading());
-    await adapter.setStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
+    await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
     await wpgStartLoading();
     if (lockMs > 0) {
       wpgLockIncreases(lockMs);
@@ -389,7 +389,7 @@ async function init(adapter) {
         wpgLogging(
           `\xDCberschuss reicht nicht mehr f\xFCr aktuelle Stufe \u2014 reduziere auf Minimum: ${wpgLevelLabel(lowest)}`
         );
-        await adapter.setStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
+        await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
         await wpgWriteStatusForWattpilot(true);
       } else {
         await wpgWriteStatusForWattpilot();
@@ -416,7 +416,7 @@ async function init(adapter) {
       wpgCurrentPhase = singlePhase2;
       wpgLogging(`Setze Ladung: ${wpgLevelLabel(newIndex)}`);
       await (singlePhase2 ? wpgSetOnePhaseLoading() : wpgSetThreePhaseLoading());
-      await adapter.setStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
+      await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_POWER, ampere, false);
       await wpgStartLoading();
       await wpgWriteStatusForWattpilot(true);
       return;
@@ -513,17 +513,17 @@ async function init(adapter) {
     }
   }
   async function wpgSetOnePhaseLoading() {
-    await adapter.setStateChangedAsync(WPG_FRONIUS_SET_STATE, "psm;1", false);
+    await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_STATE, "psm;1", false);
   }
   async function wpgSetThreePhaseLoading() {
-    await adapter.setStateChangedAsync(WPG_FRONIUS_SET_STATE, "psm;2", false);
+    await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_STATE, "psm;2", false);
   }
   async function wpgStartLoading() {
-    await adapter.setStateChangedAsync(WPG_FRONIUS_SET_STATE, "frc;0", false);
+    await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_STATE, "frc;0", false);
   }
   async function wpgStopLoading() {
     wpgLogging(`Laden gestoppt`);
-    await adapter.setStateChangedAsync(WPG_FRONIUS_SET_STATE, "frc;1", false);
+    await adapter.setForeignStateChangedAsync(WPG_FRONIUS_SET_STATE, "frc;1", false);
   }
   return { stateChangeHandler };
 }
